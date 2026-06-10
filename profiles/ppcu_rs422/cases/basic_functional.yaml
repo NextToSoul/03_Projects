@@ -1,0 +1,24 @@
+ name: 基础功能测试
+ description: 常规遥测轮询验证
+ tags: [smoke, telemetry]
+ 
+ steps:
+   - id: S01
+     name: 发送常规遥测1请求
+     action: send_command
+     command: APID_00C0
+     timeout_s: 3
+ 
+   - id: S02
+     name: 发送常规遥测2请求
+     action: send_command
+     command: APID_00C1
+     param_value: "51"
+     timeout_s: 3
+ 
+   - id: S03
+     name: 查询查询包1
+     action: send_command
+     command: APID_00C8
+     param_value: "01"
+     timeout_s: 3
