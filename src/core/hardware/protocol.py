@@ -55,14 +55,16 @@ class CCSDSCodec(ProtocolCodec):
     """
 
     def __init__(self, config: dict[str, Any] | None = None):
-        self._identifier: int = 0xEB90
+        self._command_identifier: int = 0xEB90
+        self._telemetry_identifier: int = 0x1ACF
         self._apid: int = 0x520
         self._endian: str = "big"
         self._checksum_range: tuple[int, int] = (2, 9)  # 从字节3到字节10
         
         if config:
-            self._identifier = config.get("identifier", self._identifier)
-            self._apid = config.get("apid", self._apid)
+            self._command_identifier = config.get('command_identifier', config.get('identifier', self._command_identifier))
+            self._telemetry_identifier = config.get('telemetry_identifier', config.get('identifier', 0x1ACF))
+            self._apid = config.get('apid', self._apid)
             self._endian = config.get("endian", self._endian)
             cs_config = config.get("checksum_config", {})
             if cs_config:
@@ -89,7 +91,7 @@ class CCSDSCodec(ProtocolCodec):
         
         # 4. 构建完整帧（不含校验和）
         frame = bytearray()
-        frame += struct.pack(">H", self._identifier)           # 字节 0-1: 标识符
+        frame += struct.pack(">H", self._command_identifier)           # 字节 0-1: 标识符
         
         # 字节 2-3: Version(3) + Type(1) + SubHdr(1) + APID(11)
         # Version=0, Type=0, SubHdr=0, APID_high=5, APID_low=0x20
@@ -126,7 +128,7 @@ class CCSDSCodec(ProtocolCodec):
         info.data_length = struct.unpack(">H", raw[6:8])[0]
         
         # 校验标识符
-        info.is_valid = (info.identifier == self._identifier)
+        info.is_valid = (info.identifier == self._command_identifier or info.identifier == self._telemetry_identifier)
         
         # 提取指令码（如果有）
         if len(raw) >= 10:

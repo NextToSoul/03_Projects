@@ -18,7 +18,8 @@ transport:
 protocol:
   type: ccsds
   config:
-    identifier: 0xEB90
+    command_identifier: 0xEB90
+    telemetry_identifier: 0x1ACF
     apid: 0x520
     endian: big
     sequence_range: [0, 16383]
