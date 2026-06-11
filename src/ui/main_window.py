@@ -2,6 +2,8 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import Any
+import threading
+import asyncio
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QAction, QIcon, QFont
 from PySide6.QtWidgets import (
@@ -188,12 +190,16 @@ class MainWindow(QMainWindow):
             self._signals.connection_changed.emit(False, "已断开")
 
     def _toggle_connection(self):
+        if not self._ctx.transport:
+            return
+        thread = threading.Thread(target=self._run_async_task, daemon=True)
+        thread.start()
+    
+    def _run_async_task(self):
         if self._ctx.transport and self._ctx.transport.is_connected():
-            import asyncio
-            asyncio.create_task(self._do_disconnect())
+            asyncio.run(self._do_disconnect())
         else:
-            import asyncio
-            asyncio.create_task(self._do_connect())
+            asyncio.run(self._do_connect())
 
     def _on_poll_start_all(self):
         """启动全部遥测轮询"""
