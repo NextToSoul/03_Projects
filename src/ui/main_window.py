@@ -149,12 +149,12 @@ class MainWindow(QMainWindow):
     @Slot(bool, str)
     def _on_connection_changed(self, connected: bool, detail: str):
         if connected:
-            self._conn_btn.setText("● 已连接")
-            self._conn_btn.setStyleSheet("color: green;")
+            self._conn_btn.setText("断开")
+            self._conn_btn.setStyleSheet("color: red;")
             self._status_label.setText(f"已连接: {detail}")
         else:
-            self._conn_btn.setText("○ 断开")
-            self._conn_btn.setStyleSheet("color: red;")
+            self._conn_btn.setText("连接")
+            self._conn_btn.setStyleSheet("color: green;")
             self._status_label.setText(f"断开: {detail}")
 
     @Slot(str, list)
@@ -173,14 +173,27 @@ class MainWindow(QMainWindow):
     def _on_progress(self, msg: str, pct: float):
         self._status_label.setText(f"{msg} ({pct:.0f}%)")
 
+    async def _do_connect(self):
+        if self._ctx.transport:
+            cfg = self._ctx.profile.transport_config if self._ctx.profile else {}
+            ok = await self._ctx.transport.connect(cfg)
+            if ok:
+                self._signals.connection_changed.emit(True, f"{cfg.get('host')}:{cfg.get('port')}")
+            else:
+                self._signals.connection_changed.emit(False, "连接失败")
+
+    async def _do_disconnect(self):
+        if self._ctx.transport:
+            await self._ctx.transport.disconnect()
+            self._signals.connection_changed.emit(False, "已断开")
+
     def _toggle_connection(self):
-        """连接/断开切换"""
         if self._ctx.transport and self._ctx.transport.is_connected():
             import asyncio
-            asyncio.create_task(self._ctx.transport.disconnect())
+            asyncio.create_task(self._do_disconnect())
         else:
-            # 触发连接
-            self._signals.progress_update.emit("正在连接...", 0)
+            import asyncio
+            asyncio.create_task(self._do_connect())
 
     def _on_poll_start_all(self):
         """启动全部遥测轮询"""

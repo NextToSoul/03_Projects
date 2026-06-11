@@ -8,8 +8,8 @@ created: "2026-06-10"
 transport:
   type: tcp
   config:
-    host: "192.168.1.100"
-    port: 2000
+    host: "192.168.117.26"
+    port: 20004
     reconnect_max_retries: 3
     reconnect_interval_s: 2
     timeout_s: 3.0
