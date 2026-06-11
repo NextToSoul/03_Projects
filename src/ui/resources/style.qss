@@ -1,0 +1,10 @@
+﻿/* PPCU TestBench QSS Style */
+QMainWindow { background: #f5f5f5; }
+QTableView { alternate-background-color: #f0f4f8; gridline-color: #ddd; }
+QTableView::item:selected { background: #2F5496; color: white; }
+QHeaderView::section { background: #2F5496; color: white; padding: 4px; font-weight: bold; }
+QToolBar { background: #e8eef5; border-bottom: 1px solid #ccc; padding: 2px; }
+QPushButton { padding: 4px 12px; border: 1px solid #bbb; border-radius: 3px; background: #fff; }
+QPushButton:hover { background: #e0e8f0; }
+QPushButton:pressed { background: #c0c8d0; }
+QStatusBar { background: #e8eef5; border-top: 1px solid #ccc; }
